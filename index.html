@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Drawer</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="index.js"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "dark" });
+    </script>
+    <script type="module">
+      import * as monaco from "https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/+esm";
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      import { value, strToMermaid } from "./script.js";
+      const editor = monaco.editor.create(document.querySelector(".monaco"), {
+        theme: "vs-dark",
+        value: value,
+        language: "python",
+        lineNumbers: "on",
+        wordWrap: "on",
+      });
+      const drawDiagram = async function () {
+        const element = document.querySelector("#mermaid");
+        const graphDefinition = strToMermaid(editor.getModel().getValue());
+        const { svg } = await mermaid.render("graphDiv", graphDefinition);
+        element.innerHTML = svg;
+      };
+
+      drawDiagram();
+
+      editor.onDidChangeModelContent((e) => {
+        drawDiagram();
+      });
+    </script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/vscode-codicons@0.0.17/dist/codicon.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-zinc-800 flex w-screen relative">
+    <div
+      class="w-1/2 h-screen bg-zinc-900 flex flex-col text-white relative overflow-y-scroll"
+    >
+      <pre id="mermaid" class="mx-auto h-full mermaidItem w-full py-20"></pre>
+    </div>
+    <div
+      class="w-1/2 h-screen bg-zinc-900 flex flex-col relative overflow-x-hidden"
+    >
+      <div class="monaco w-full h-full bg-red-600"></div>
+    </div>
+  </body>
+</html>
